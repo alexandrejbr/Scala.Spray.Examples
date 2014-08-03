@@ -72,7 +72,12 @@ trait HumanResourcesHttpService extends HttpService {
       path("employees") {
         get {
           // search q parameter in employee name and return only the number of results specified in limit parameter
-          complete(Employee.all)
+          parameters('q.as[Option[String]], 'limit.as[Option[Int]]) { (q, limit) =>
+            complete{
+              val filtered = q.fold(Employee.all)(s => Employee.all.filter(e => e.name.toLowerCase.indexOf(s.toLowerCase) >= 0))
+              limit.fold(filtered)(l => filtered.take(l))
+            }
+          }
         } ~
           post {
             // add an employee to the collection
