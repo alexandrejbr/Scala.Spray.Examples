@@ -28,24 +28,32 @@ class HumanResourcesHttpServiceSpec extends Specification with Specs2RouteTest w
     }
 
     "return a greeting for GET requests to the root path" in {
-      Put("/employee/4", Employee("Pedro", Some("4"), "SAPO", 170000, 22)) ~> myRoute ~> check {
-        mediaType === `application/json`
-        status === Created
-        responseAs[String] must contain("Pedro")
+      val validCredentials = BasicHttpCredentials("Admin", "password")
+      Put("/employee/4", Employee("Peter", Some("4"), "Financial", 170000, 22)) ~>
+        addCredentials(validCredentials) ~> myRoute ~> check {
+          mediaType === `application/json`
+          status === Created
+          responseAs[String] must contain("Peter")
       }
     }
 
-    //    "leave GET requests to other paths unhandled" in {
-    //      Get("/kermit") ~> myRoute ~> check {
-    //        handled must beFalse
-    //      }
-    //    }
-    //
-    //    "return a MethodNotAllowed error for PUT requests to the root path" in {
-    //      Put() ~> sealRoute(myRoute) ~> check {
-    //        status === MethodNotAllowed
-    //        responseAs[String] === "HTTP method not allowed, supported methods: GET"
-    //      }
-    //    }
+    "writes without providing credentials receive 401" in {
+      Put("/employee/4", Employee("Pedro", Some("4"), "Financial", 170000, 22)) ~> myRoute ~> check {
+        status === StatusCodes.Unauthorized
+        responseAs[String] === "The resource requires authentication, which was not supplied with the request"
+        header[HttpHeaders.`WWW-Authenticate`].get.challenges.head === HttpChallenge("Basic", "writes must be authenticated")
+      }
+    }
+
+    "writes with bad credentials receive 401" in {
+      val invalidCredentials = BasicHttpCredentials("Peter", "pan")
+      Put("/employee/4", Employee("Pedro", Some("4"), "Financial", 170000, 22)) ~>
+        addCredentials(invalidCredentials) ~> myRoute ~> check {
+          status === StatusCodes.Unauthorized
+          responseAs[String] === "The supplied authentication is invalid"
+          header[HttpHeaders.`WWW-Authenticate`].get.challenges.head === HttpChallenge("Basic", "writes must be authenticated")
+      }
+    }
+
   }
 }

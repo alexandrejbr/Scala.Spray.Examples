@@ -11,6 +11,7 @@ import spray.http.Uri.Path
 import spray.http.Uri.Path.Slash
 import spray.http.Uri.Path.Segment
 import spray.routing.HttpService
+import spray.routing.authentication.{BasicAuth, UserPass}
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContextExecutor
@@ -37,7 +38,13 @@ trait HumanResourcesHttpService extends HttpService {
 
   implicit val compactPrinter : JsonPrinter = CompactPrinter // http://spray.io/documentation/1.2.1/spray-httpx/spray-json-support/
 
-  val myRoute =
+  def userPassAuthenticator(userPass: Option[UserPass]): Future[Option[String]] =
+    Future {
+      if (userPass.exists(up => up.user == "Admin" && up.pass == "password")) Some("Admin")
+      else None
+    }
+
+  val myRoute = sealRoute { // "Seals" a route by wrapping it with exception handling and rejection conversion.
     path("employee" / Segment) { id =>
       get {
         // Get resource by ID or return a 404
@@ -47,11 +54,14 @@ trait HumanResourcesHttpService extends HttpService {
       } ~
         put {
           // Substitute the resource by the representation in the body. If a resource is created return 201
-          requestUri { uri =>
-            entity(as[Employee]) { employee =>
-              Employee.put(employee).fold(complete(StatusCodes.Created, List(HttpHeaders.Location(uri)), employee))(_ => complete(employee))
+          authenticate(BasicAuth(userPassAuthenticator _, realm = "writes must be authenticated")){ userName => // in this example userName is not being used
+            requestUri { uri =>
+              entity(as[Employee]) { employee =>
+                Employee.put(employee).fold(complete(StatusCodes.Created, List(HttpHeaders.Location(uri)), employee))(_ => complete(employee))
+              }
             }
           }
+
         } ~
         delete {
           // Delete the resource if it exists, if it doesn't exist them return 404
@@ -74,6 +84,8 @@ trait HumanResourcesHttpService extends HttpService {
             }
           }
       }
+  }
+
 }
 
 
