@@ -1,0 +1,22 @@
+- Open Issues:
+	1) should, or should not, plaintext requests to SSL port make server close the connection?	
+
+
+- handshake with client authentication:
+	openssl s_client -connect host:443 -cert cert_and_key.pem -key cert_and_key.pem
+
+
+-Extract key pairs from jks (http://crishantha.com/wp/?p=445):
+	1) keytool -v -importkeystore -srckeystore keystore.jks -srcalias selfsigned -destkeystore myp12file.p12 -deststoretype PKCS12
+	2) openssl pkcs12 -in myp12file.p12 -out private.pem
+
+- Generate a keystore and self-signed certificate (http://www.sslshopper.com/article-most-common-java-keytool-keystore-commands.html):
+	1) keytool -genkey -keyalg RSA -alias selfsigned -keystore keystore.jks -storepass password -validity 360 -keysize 2048
+
+- Httpie requests
+	1) http post https://localhost:9000/employees anualSalary:=10000 vacationDays:=25 department=Managment name=Dick idNumber=4 --verify=no
+	2) http get https://localhost:9000/employees --verify=no
+	3) http put https://localhost:9000/employee/5 anualSalary:=10000 vacationDays:=25 department=Managment idNumber="5" name=Dick --verify=no --verbose
+
+- Convert a PEM certificate file and a private key to PKCS#12 (.pfx .p12)
+	1) openssl pkcs12 -export -out certs.pfx -inkey private.pem -in private.pem -certfile private.pem
