@@ -1,4 +1,4 @@
-package oi.serviceEnablers
+package spray.examples
 
 import java.io.FileInputStream
 import java.security.{SecureRandom, KeyStore}

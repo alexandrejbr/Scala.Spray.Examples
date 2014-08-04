@@ -1,4 +1,4 @@
-package oi.serviceEnablers
+package spray.examples
 
 import akka.actor.Actor
 import spray.http._
@@ -44,7 +44,7 @@ trait HumanResourcesHttpService extends HttpService {
       else None
     }
 
-  val myRoute = sealRoute { // "Seals" a route by wrapping it with exception handling and rejection conversion.
+  val myRoute =
     path("employee" / Segment) { id =>
       get {
         // Get resource by ID or return a 404
@@ -89,8 +89,6 @@ trait HumanResourcesHttpService extends HttpService {
             }
           }
       }
-  }
-
 }
 
 

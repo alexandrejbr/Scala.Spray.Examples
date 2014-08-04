@@ -1,4 +1,4 @@
-package oi.serviceEnablers
+package spray.examples
 
 import spray.json._
 import DefaultJsonProtocol._

@@ -2,13 +2,13 @@ import org.specs2.mutable.Specification
 import spray.testkit.Specs2RouteTest
 import spray.http._
 import StatusCodes._
-import oi.serviceEnablers.HumanResourcesHttpService
+import spray.examples.HumanResourcesHttpService
 //import org.junit.runner.RunWith
 //import org.specs2.runner.JUnitRunner
-import oi.serviceEnablers.MyJsonProtocol._
+import spray.examples.MyJsonProtocol._
 import spray.httpx.SprayJsonSupport.sprayJsonMarshaller
 import spray.httpx.SprayJsonSupport.sprayJsonUnmarshaller
-import oi.serviceEnablers.Employee
+import spray.examples.Employee
 import MediaTypes._
 
 //@RunWith(classOf[JUnitRunner])
@@ -38,7 +38,7 @@ class HumanResourcesHttpServiceSpec extends Specification with Specs2RouteTest w
     }
 
     "writes without providing credentials receive 401" in {
-      Put("/employee/4", Employee("Pedro", Some("4"), "Financial", 170000, 22)) ~> myRoute ~> check {
+      Put("/employee/4", Employee("Pedro", Some("4"), "Financial", 170000, 22)) ~> sealRoute(myRoute) ~> check {
         status === StatusCodes.Unauthorized
         responseAs[String] === "The resource requires authentication, which was not supplied with the request"
         header[HttpHeaders.`WWW-Authenticate`].get.challenges.head === HttpChallenge("Basic", "writes must be authenticated")
@@ -48,7 +48,7 @@ class HumanResourcesHttpServiceSpec extends Specification with Specs2RouteTest w
     "writes with bad credentials receive 401" in {
       val invalidCredentials = BasicHttpCredentials("Peter", "pan")
       Put("/employee/4", Employee("Pedro", Some("4"), "Financial", 170000, 22)) ~>
-        addCredentials(invalidCredentials) ~> myRoute ~> check {
+        addCredentials(invalidCredentials) ~> sealRoute(myRoute) ~> check {
           status === StatusCodes.Unauthorized
           responseAs[String] === "The supplied authentication is invalid"
           header[HttpHeaders.`WWW-Authenticate`].get.challenges.head === HttpChallenge("Basic", "writes must be authenticated")
