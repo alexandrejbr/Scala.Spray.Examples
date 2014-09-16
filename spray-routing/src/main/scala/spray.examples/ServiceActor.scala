@@ -57,7 +57,7 @@ trait HumanResourcesHttpService extends HttpService {
           authenticate(BasicAuth(userPassAuthenticator _, realm = "writes must be authenticated")){ userName => // in this example userName is not being used
             requestUri { uri =>
               entity(as[Employee]) { employee =>
-                Employee.put(employee).fold(complete(StatusCodes.Created, List(HttpHeaders.Location(uri)), employee))(_ => complete(employee))
+                Employee.put(employee.copy(idNumber = Some(id))).fold(complete(StatusCodes.Created, List(HttpHeaders.Location(uri)), employee))(_ => complete(employee))
               }
             }
           }

@@ -19,7 +19,7 @@ object Employee {
 
   def all = employees
 
-  def get(idNumber: String) = employees.find(e => e.idNumber == idNumber)
+  def get(idNumber: String) = employees.find(e => e.idNumber.contains(idNumber))
 
   def post(employee: Employee) = {
     employees = employee :: employees
@@ -27,8 +27,8 @@ object Employee {
   }
 
   def delete(idNumber: String) = {
-    val employee = employees.find(e => e.idNumber == idNumber)
-    employees = employees.filterNot(e => e.idNumber == idNumber)
+    val employee = employees.find(e => e.idNumber.contains(idNumber))
+    employees = employees.filterNot(e => e.idNumber.contains(idNumber))
     employee
   }
 
