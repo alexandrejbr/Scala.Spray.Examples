@@ -19,4 +19,18 @@
 	3) http put https://localhost:9000/employee/5 anualSalary:=10000 vacationDays:=25 department=Managment idNumber="5" name=Dick --verify=no --verbose
 
 - Convert a PEM certificate file and a private key to PKCS#12 (.pfx .p12)
-	1) openssl pkcs12 -export -out certs.pfx -inkey private.pem -in private.pem -certfile private.pem
+	1) openssl pkcs12 -export -out certs.pfx -in private.pem  //-certfile private.pem -inkey private.pem
+
+- How do I base64-encode something?
+	1) openssl enc -base64 -in certs.pfx -out certs.pfx.text
+		2) the result may have \r\n that must be removed using \r?\n
+
+
+- 
+	openssl s_client -connect host:443 -cert cert_and_key.pem -key cert_and_key.pem -state -debug
+
+Check a certificate
+openssl x509 -in private.pem -text -noout
+
+- Enable Java SSL debugging options
+ - java -Djavax.net.debug=ssl:handshake:verbose -jar human-resources-oi-assembly-0.1.jar
