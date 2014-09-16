@@ -40,7 +40,6 @@ trait ServerSslConfiguration {
 
   implicit def sslEngineProvider: ServerSSLEngineProvider = {
     ServerSSLEngineProvider { engine =>
-      engine.setEnabledProtocols(Array("SSLv2Hello","SSLv3", "TLSv1.2"))
       //engine.setNeedClientAuth(true)
       //engine.setWantClientAuth(true)
       engine
