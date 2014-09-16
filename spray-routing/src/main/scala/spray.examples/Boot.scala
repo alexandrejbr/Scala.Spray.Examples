@@ -27,4 +27,8 @@ object Boot extends App with ServerSslConfiguration {
   implicit val timeout = Timeout(5 seconds)
 
   IO(Http) ? Http.Bind(service, interface, port)
+
+  def close(args: Array[String]) = {
+   system.shutdown()
+  }
 }
